@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: ecommerce-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"  # Umożliwia dostęp do bazy poza kontenerem
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Utrwalanie danych bazy
+    networks:
+      - ecommerce-network  # Przypisanie do własnej sieci
+
+  backend:
+    build: backend
+    container_name: ecommerce-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecommerce
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update  # Automatyczne tworzenie tabel
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+    ports:
+      - "8081:8081"
+    networks:
+      - ecommerce-network  # Przypisanie do tej samej sieci
+
+
+  frontend:
+    build: ecommerce-app-frontend
+    container_name: ecommerce-frontend
+    ports:
+      - "8080:4173"  # Mapowanie na ten sam port co lokalny serwer Vite
+    depends_on:
+      - backend
+    networks:
+      - ecommerce-network
+    environment:
+      - NODE_ENV=production  # Ustawienie trybu produkcyjnego
+
+volumes:
+  postgres_data:
+    driver: local  # Lokalny wolumen dla danych bazy
+
+networks:
+  ecommerce-network:
+    driver: bridge  # Sieć typu bridge dla komunikacji między kontenerami
+
