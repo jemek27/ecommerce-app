@@ -23,7 +23,6 @@ public class JwtUtil {
 //        return Keys.hmacShaKeyFor(keyBytes);
 //    }
 
-    // 🔹 Generowanie tokena JWT
     public String generateToken(String username) {
         return Jwts.builder()
                 .subject(username)
@@ -31,36 +30,27 @@ public class JwtUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10 godzin
                 .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)), SignatureAlgorithm.HS256)
                 .compact();
-    }
+    } //TODO lower expiration time and refresh token
 
-    // 🔹 Pobieranie nazwy użytkownika z tokena
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
-    // 🔹 Sprawdzenie poprawności tokena
     public boolean validateToken(String token, String username) {
         return username.equals(extractUsername(token)) && !isTokenExpired(token);
     }
 
-    // 🔹 Sprawdzenie, czy token wygasł
     private boolean isTokenExpired(String token) {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    // 🔹 Pobieranie dowolnych danych z tokena JWT
+    // Pobieranie dowolnych danych z tokena JWT
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = Jwts.parser() // 🔥 WAŻNE: Poprawiona wersja parsera
+        final Claims claims = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
         return claimsResolver.apply(claims);
-    }
-
-    // 🔹 Generowanie nowego klucza BASE64 (dla testów)
-    public static String generateSecretKey() {
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        return Encoders.BASE64.encode(key.getEncoded());
     }
 }

@@ -1,34 +1,11 @@
 package com.ecommerce.ecommerce_app.model;
 
-//import jakarta.persistence.*;
-//import lombok.*;
-//
-//@Entity
-//@Table(name = "users")
-//@Data
-//public class User {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @Column(unique = true, nullable = false)
-//    private String username;
-//
-//    @Column(nullable = false)
-//    private String password;
-//
-//    @Enumerated(EnumType.STRING)
-//    private Role role;
-//
-//    public enum Role {
-//        USER, ADMIN
-//    }
-//}
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -52,7 +29,11 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;  // Nowe pole przechowujące rolę użytkownika
+    private Role role;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
 
     public User() {}
 

@@ -19,6 +19,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
+
     public AuthenticationService(UserRepository userRepository,
                                  JwtUtil jwtUtil,
                                  AuthenticationManager authenticationManager,

@@ -30,13 +30,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // Poprawna wersja w Spring Security 6.1+
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // Publiczne endpointy
-                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll() // User i Admin mogą czytać
-                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN") // Tylko Admin może dodawać
-                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN") // Tylko Admin może edytować
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN") // Tylko Admin może usuwać
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/reviews/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Brak sesji - używamy JWT
