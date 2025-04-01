@@ -1,9 +1,13 @@
 package com.ecommerce.ecommerce_app.controller;
 
-import com.ecommerce.ecommerce_app.model.Product;
+
+import com.ecommerce.ecommerce_app.dto.ProductRequest;
+import com.ecommerce.ecommerce_app.dto.ProductResponse;
 import com.ecommerce.ecommerce_app.service.ProductService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -18,23 +22,25 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponse> getAllProducts() {
         return productService.getAllProducts();
     }
 
     @GetMapping("/search")
-    public List<Product> getProductsByName(@RequestParam String name) {
+    public List<ProductResponse> getProductsByName(@RequestParam String name) {
         return productService.getProductsByName(name);
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public Product createProduct(@RequestBody Product product) {
+    public ProductResponse createProduct(@RequestBody ProductRequest product) {
         return productService.saveProduct(product);
     }
 
