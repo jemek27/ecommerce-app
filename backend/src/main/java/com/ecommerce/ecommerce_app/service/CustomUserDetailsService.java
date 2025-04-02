@@ -31,6 +31,9 @@ public class CustomUserDetailsService implements UserDetailsService {
         userRepository.save(user);
     }
 
-    public User getUserById(Long userId) { return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")); }
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
 
