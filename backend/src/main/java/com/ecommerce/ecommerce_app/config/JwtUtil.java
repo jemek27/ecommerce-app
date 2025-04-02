@@ -21,7 +21,7 @@ public class JwtUtil {
     private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 1; // 15 minutes
     //private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 3; // 3 days
     private static final SecureRandom secureRandom = new SecureRandom();
-    private static final int TOKEN_LENGTH = 32; // Długość w bajtach (256 bitów)
+    private static final int TOKEN_LENGTH = 32; // Length in bytes (256 bits)
 
     public String generateAccessToken(String username, Long userId) {
         return Jwts.builder()
@@ -51,7 +51,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration).before(new Date());
     }
 
-    // Pobieranie dowolnych danych z tokena JWT
+    // get any data from a JWT token
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parser()
                 .verifyWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)))

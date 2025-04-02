@@ -10,6 +10,7 @@ import com.ecommerce.ecommerce_app.model.User;
 import com.ecommerce.ecommerce_app.repository.RefreshTokenRepository;
 import com.ecommerce.ecommerce_app.repository.UserRepository;
 import com.ecommerce.ecommerce_app.config.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,26 +21,16 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.UUID;
+
 
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
-
-
-    public AuthenticationService(UserRepository userRepository, JwtUtil jwtUtil,
-                                 AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
-                                 RefreshTokenRepository refreshTokenRepository) {
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.refreshTokenRepository = refreshTokenRepository;
-    }
 
     public AuthenticationResponse login(AuthenticationRequest request) {
         authenticationManager.authenticate(
@@ -57,15 +48,15 @@ public class AuthenticationService {
 
     public String register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            return "Użytkownik już istnieje";
+            return "The user already exists";
         }
 
-        // Sprawdzamy czy rola jest pusta, jeśli tak, ustawiamy domyślną rolę USER
+        // Check if the role is empty, if so, set the default role USER
         Role role = request.getRole() != null ? request.getRole() : Role.USER;
 
         User newUser = new User(request.getUsername(), passwordEncoder.encode(request.getPassword()), role);
         userRepository.save(newUser);
-        return "Rejestracja zakończona sukcesem";
+        return "Registration successfully completed";
     }
 
     public ResponseEntity<?> refreshToken(RefreshTokenRequest request) {
@@ -81,11 +72,9 @@ public class AuthenticationService {
 
         User user = storedToken.getUser();
 
-        // Usuwamy stary refresh token i generujemy nowy
         refreshTokenRepository.delete(storedToken);
         String newRefreshToken = generateRefreshToken(user);
 
-        // Generujemy nowy access token
         String newAccessToken = jwtUtil.generateAccessToken(user.getUsername(), user.getId());
 
         return ResponseEntity.ok(new AuthenticationResponse(newAccessToken, newRefreshToken));
