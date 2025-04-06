@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 
 @Service
@@ -81,13 +82,14 @@ public class AuthenticationService {
     }
 
     private String generateRefreshToken(User user) {
-        RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(user);
-        refreshToken.setToken(jwtUtil.generateSecureToken());
-        refreshToken.setExpiryDate(Instant.now().plus(3, ChronoUnit.DAYS));
+        Optional<RefreshToken> existingTokenOpt = refreshTokenRepository.findByUser(user);
+        RefreshToken token = existingTokenOpt.orElseGet(RefreshToken::new);
 
-        refreshTokenRepository.deleteByUser(user);
-        refreshTokenRepository.save(refreshToken);
-        return refreshToken.getToken();
+        token.setUser(user);
+        token.setToken(jwtUtil.generateSecureToken());
+        token.setExpiryDate(Instant.now().plus(3, ChronoUnit.DAYS));
+
+        refreshTokenRepository.save(token);
+        return token.getToken();
     }
 }
