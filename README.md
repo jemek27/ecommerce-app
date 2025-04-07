@@ -26,7 +26,7 @@ The application also features API documentation via **Swagger (Springdoc OpenAPI
    ```sh
    docker-compose up --build
 The Docker Compose configuration sets up three services:
-- postgres: the PostgreSQL database accessible on port 5432,
+- postgres: the PostgreSQL database accessible on port 8082,
 - backend: the Spring Boot application running on port 8081,
 - frontend: the frontend service running on port 8080.
 
