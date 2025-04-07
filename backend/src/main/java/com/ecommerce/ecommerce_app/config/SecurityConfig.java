@@ -18,7 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
-
     private final JwtFilter jwtFilter;
     private final CustomUserDetailsService userDetailsService;
 
@@ -32,7 +31,8 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // Publiczne endpointy
+                        .requestMatchers("/auth/**").permitAll() // Public endpoints
+                        .requestMatchers("/api/hello").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
@@ -44,8 +44,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Brak sesji - używamy JWT
-                .authenticationProvider(authenticationProvider()) // Ustawienie dostawcy uwierzytelniania
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Dodanie filtra JWT
+                .authenticationProvider(authenticationProvider()) // Setting the authentication provider
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // Adding a JWT filter
                 .build();
     }
 

@@ -5,18 +5,16 @@ import com.ecommerce.ecommerce_app.model.Review;
 import com.ecommerce.ecommerce_app.dto.ProductRequest;
 import com.ecommerce.ecommerce_app.dto.ProductResponse;
 import com.ecommerce.ecommerce_app.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-
-    public ProductService(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
 
     public List<ProductResponse> getAllProducts() {
         List<Product> products = productRepository.findAll();

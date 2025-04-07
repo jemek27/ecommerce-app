@@ -37,15 +37,17 @@ public class JwtFilter extends OncePerRequestFilter {
                 username = jwtUtil.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
                 logger.warn("Token JWT wygasł!");
+                chain.doFilter(request, response);
+                return; // If the token has expired, we stop filtering
             }
         }
 
-        // Jeśli token jest poprawny i użytkownik nie jest jeszcze uwierzytelniony
+        // If the token is valid and the user is not yet authenticated
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
-                // Tworzymy obiekt Authentication
+                // We are creating an Authentication object
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -53,10 +55,10 @@ public class JwtFilter extends OncePerRequestFilter {
                                 userDetails.getAuthorities()
                         );
 
-                // Ustawiamy szczegóły autoryzacji w kontekście bezpieczeństwa
+                // Set authorization details in the context of security
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Rejestrujemy użytkownika jako uwierzytelnionego
+                // We register the user as authenticated
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

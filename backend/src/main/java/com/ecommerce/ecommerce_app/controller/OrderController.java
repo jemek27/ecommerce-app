@@ -1,7 +1,5 @@
 package com.ecommerce.ecommerce_app.controller;
 
-import com.ecommerce.ecommerce_app.model.User;
-import com.ecommerce.ecommerce_app.model.Order;
 import com.ecommerce.ecommerce_app.dto.OrderRequest;
 import com.ecommerce.ecommerce_app.dto.OrderResponse;
 import com.ecommerce.ecommerce_app.service.OrderService;
