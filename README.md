@@ -20,7 +20,7 @@ The application also features API documentation via **Swagger (Springdoc OpenAPI
 
 1. Clone the repository:  
    ```sh
-   git clone https://github.com/jemek27/ecommerce-app.git
+   git clone --recurse-submodules https://github.com/jemek27/ecommerce-app.git
    cd ecommerce-app
 2. Use Docker Compose to run all services
    ```sh
