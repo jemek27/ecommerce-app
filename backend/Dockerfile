@@ -1,14 +1,16 @@
-# Używamy obrazu OpenJDK jako bazy
-FROM openjdk:17-jdk-slim
-
-# Ustawiamy katalog roboczy
+FROM maven:3.9.3-eclipse-temurin-17 AS build
 WORKDIR /app
-ARG JAR_FILE=target/*.jar
-# Kopiujemy plik JAR do kontenera
-COPY ${JAR_FILE} app.jar
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Otwieramy port, na którym aplikacja będzie działać
+
+FROM openjdk:17-jdk-slim
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar app.jar
+#ARG JAR_FILE=target/*.jar
+#COPY ${JAR_FILE} app.jar
+
 EXPOSE 8081
-
-# Uruchamiamy aplikację Spring Boot
 CMD ["java", "-jar", "app.jar"]
