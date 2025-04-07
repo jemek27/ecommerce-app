@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: ecommerce
     ports:
-      - "5432:5432"  # Umożliwia dostęp do bazy poza kontenerem
+      - "8082:5432"  # Umożliwia dostęp do bazy poza kontenerem
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Utrwalanie danych bazy
     networks:
