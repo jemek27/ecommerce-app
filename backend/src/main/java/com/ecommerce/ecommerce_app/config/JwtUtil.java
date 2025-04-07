@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtUtil {
     private static final String SECRET_KEY = "3Fk9bH2nV6D7Ml7H9QzPjQogS2nB8tVWyH4E0YYvD2g=";
-    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 1; // 15 minutes
+    private static final long ACCESS_TOKEN_EXPIRATION = 1000 * 60 * 5; // 5 minutes
     //private static final long REFRESH_TOKEN_EXPIRATION = 1000 * 60 * 60 * 24 * 3; // 3 days
     private static final SecureRandom secureRandom = new SecureRandom();
     private static final int TOKEN_LENGTH = 32; // Length in bytes (256 bits)
