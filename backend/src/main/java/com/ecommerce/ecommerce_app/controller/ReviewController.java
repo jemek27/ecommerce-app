@@ -10,7 +10,6 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
 public class ReviewController {
