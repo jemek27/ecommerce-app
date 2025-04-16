@@ -27,19 +27,18 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CustomUserDetailsService userService;
 
     public AuthenticationResponse login(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.getUserByUsername(request.getUsername());
 
         String accessToken = jwtUtil.generateAccessToken(user.getUsername(), user.getId());
         String refreshToken = generateRefreshToken(user);
@@ -48,15 +47,14 @@ public class AuthenticationService {
     }
 
     public String register(RegisterRequest request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+        if (userService.userExists(request.getUsername())) {
             return "The user already exists";
         }
 
         // Check if the role is empty, if so, set the default role USER
         Role role = request.getRole() != null ? request.getRole() : Role.USER;
 
-        User newUser = new User(request.getUsername(), passwordEncoder.encode(request.getPassword()), role);
-        userRepository.save(newUser);
+        userService.createUser(request.getUsername(), passwordEncoder.encode(request.getPassword()), role);
         return "Registration successfully completed";
     }
 

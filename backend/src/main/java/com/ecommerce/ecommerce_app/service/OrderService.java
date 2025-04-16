@@ -65,22 +65,8 @@ public class OrderService {
     }
 
     private OrderResponse mapToOrderResponse(Order order) {
-        return new OrderResponse(
-                order.getId(),
-                order.getUser().getUsername(),
-                order.getOrderDate(),
-                order.getOrderProducts().stream()
-                        .map(this::mapToOrderedProductResponse)
-                        .collect(Collectors.toList())
-        );
+        return new OrderResponse(order);
     }
 
-    private OrderedProductResponse mapToOrderedProductResponse(OrderProduct orderProduct) {
-        return new OrderedProductResponse(
-                orderProduct.getProduct().getId(),
-                orderProduct.getProduct().getName(),
-                orderProduct.getProduct().getPrice() * orderProduct.getQuantity(),
-                orderProduct.getQuantity()
-        );
-    }
+
 }
