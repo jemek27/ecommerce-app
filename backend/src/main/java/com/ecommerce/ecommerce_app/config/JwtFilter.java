@@ -36,9 +36,9 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
-                logger.warn("Token JWT wygasł!");
-                chain.doFilter(request, response);
-                return; // If the token has expired, we stop filtering
+                logger.warn("JWT token has expired!");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "JWT token has expired!");
+                return;
             }
         }
 
