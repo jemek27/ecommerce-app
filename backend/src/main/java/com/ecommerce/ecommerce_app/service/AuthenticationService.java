@@ -10,6 +10,8 @@ import com.ecommerce.ecommerce_app.model.User;
 import com.ecommerce.ecommerce_app.repository.RefreshTokenRepository;
 import com.ecommerce.ecommerce_app.repository.UserRepository;
 import com.ecommerce.ecommerce_app.config.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,9 +60,7 @@ public class AuthenticationService {
         return "Registration successfully completed";
     }
 
-    public ResponseEntity<?> refreshToken(RefreshTokenRequest request) {
-        String refreshToken = request.getRefreshToken();
-
+    public ResponseEntity<?> refreshToken(String refreshToken, HttpServletResponse response) {
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
                 .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
 
@@ -73,10 +73,11 @@ public class AuthenticationService {
 
         refreshTokenRepository.delete(storedToken);
         String newRefreshToken = generateRefreshToken(user);
-
         String newAccessToken = jwtUtil.generateAccessToken(user.getUsername(), user.getId());
 
-        return ResponseEntity.ok(new AuthenticationResponse(newAccessToken, newRefreshToken));
+        setRefreshTokenCookie(response, newRefreshToken);
+
+        return ResponseEntity.ok(new AuthenticationResponse(newAccessToken, null));
     }
 
     private String generateRefreshToken(User user) {
@@ -89,5 +90,20 @@ public class AuthenticationService {
 
         refreshTokenRepository.save(token);
         return token.getToken();
+    }
+
+    public void setRefreshTokenCookie(HttpServletResponse response, String newRefreshToken) {
+//        Cookie refreshCookie = new Cookie("refreshToken", newRefreshToken);
+//        refreshCookie.setHttpOnly(true);
+//        //refreshCookie.setSecure(true);
+//        refreshCookie.setPath("/auth/refresh");
+//        refreshCookie.setMaxAge(3 * 24 * 60 * 60);
+//        response.addCookie(refreshCookie);
+        String cookieValue = String.format(
+                "refreshToken=%s; Path=/auth/refresh; HttpOnly; SameSite=None; Secure; Max-Age=%d",
+                newRefreshToken, 3 * 24 * 60 * 60
+        );
+
+        response.setHeader("Set-Cookie", cookieValue);
     }
 }
